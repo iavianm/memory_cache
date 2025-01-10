@@ -10,22 +10,22 @@ func New() *Cache {
 
 func (c *Cache) Set(key string, value interface{}) {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	c.data[key] = value
 }
 
 func (c *Cache) Get(key string) (interface{}, error) {
 	c.mu.RLock()
+	defer c.mu.RUnlock()
 	value, ok := c.data[key]
 	if !ok {
-		c.mu.RUnlock()
 		return nil, errors.New("key not found")
 	}
-	c.mu.RUnlock()
 	return value, nil
 }
 
 func (c *Cache) Delete(key string) {
 	c.mu.Lock()
+	defer c.mu.Unlock()
 	delete(c.data, key)
-	c.mu.Unlock()
 }
